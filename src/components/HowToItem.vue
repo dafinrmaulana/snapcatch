@@ -3,17 +3,12 @@ const props = defineProps({
   title: String,
   description: String,
   number: Number,
-  isActive: { Boolean, default: false },
 });
 </script>
 
 <template>
   <div
-    class="size-7 grid place-items-center font-semibold border border-primary rounded-full flex-none"
-    :class="{
-      'text-primary bg-transparent': !props.isActive,
-      'text-white bg-primary': props.isActive,
-    }"
+    class="size-7 grid place-items-center font-semibold border border-primary rounded-full flex-none text-primary bg-transparent transition-colors duration-200 group-hover:text-white group-hover:bg-primary"
   >
     {{ props.number }}
   </div>

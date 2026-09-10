@@ -4,21 +4,18 @@ export const howTos = [
     description:
       "Find The Video You Want From Among The Videos Available On YouTube And Copy Its Link",
     number: 1,
-    isActive: false,
   },
   {
     title: "Paste Link",
     description:
       "Paste The Copied Link In The Desired Box And Then Wait For The System To Display The Desired Video Download Links In Different Formats And Sizes.",
     number: 2,
-    isActive: true,
   },
   {
     title: "Download Video",
     description:
       "And In The Last Step, Click On Download From The Displayed List And Download The Desired Video And Save It On Your Device.",
     number: 3,
-    isActive: false,
   },
 ];
 
@@ -46,11 +43,11 @@ export const faqs = [
   {
     question: "Is SnapCatch open source?",
     answer:
-      "Yes both backend and frontend are open source. You can view the source code for the frontend on GitHub https://github.com/dafinrmaulana/snapcatch and the backend on GitHub https://github.com/kodingkeun/downloader-api",
+      "Yes both backend and frontend are open source. You can view the source code for the frontend on GitHub https://github.com/dafinrmaulana/snapcatch and the backend on GitHub https://github.com/fahrigunadi/ytdl",
   },
   {
     question: "What technologies are used in SnapCatch?",
     answer:
-      "SnapCatch is built using Vue.js, Tailwind CSS, and Vite. But for the backend we use express js.",
+      "SnapCatch is built using Vue.js, Tailwind CSS, and Vite. The backend is written in Go (Gin) and wraps yt-dlp to fetch and stream the videos.",
   },
 ];

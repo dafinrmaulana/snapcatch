@@ -10,7 +10,7 @@ import {
   ClipboardIcon,
   XMarkIcon,
 } from "@heroicons/vue/20/solid";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import Accordion from "./components/Accordion.vue";
 import Button from "./components/Button.vue";
 import CardVideo from "./components/CardVideo.vue";
@@ -22,54 +22,44 @@ import { useDarkMode } from "./composables/useDarkMode";
 import { useClipboard } from "./composables/useClipboard";
 import { faqs, howTos } from "./constants";
 
+const apiBase = import.meta.env.VITE_API_URL;
+const SUPPORTED_HOSTS = ["youtube.com", "youtu.be", "tiktok.com"];
+
 const { enabled } = useDarkMode();
 const query = ref("");
 const { isLoading, error, data, getData } = useApi();
-const {
-  isLoading: isDownloading,
-  error: isDownloadingError,
-  data: downloadData,
-  getData: downloadVideo,
-} = useApi();
 const { pasteFromClipboard } = useClipboard();
 
-const selectedRes = ref("Choose One");
+// selectedRes holds the chosen format's relative download_url, or "" when unset.
+const selectedRes = ref("");
+
+const isYoutube = computed(
+  () => query.value.includes("youtube.com") || query.value.includes("youtu.be"),
+);
+const isSupported = computed(() =>
+  SUPPORTED_HOSTS.some((host) => query.value.includes(host)),
+);
 
 const handleChangeQuery = (e) => {
   query.value = e.target.value;
-  data.value = {};
+  data.value = null;
 };
 
 const handleGetData = () => {
-  if (query.value.includes("youtube.com") || query.value.includes("youtu.be")) {
-    getData("ytdl/info", query.value);
-  }
-
-  if (query.value.includes("tiktok.com")) {
-    getData("tiktok/info", query.value);
-  }
+  if (!isSupported.value) return;
+  selectedRes.value = "";
+  getData("/api/info", { url: query.value });
 };
 
-const handleDownload = async () => {
-  if (selectedRes.value === "Choose One") return;
-  if (selectedRes.value === "fullhd" && query.value.includes("youtube.com")) {
-    try {
-      await downloadVideo("ytdl", query.value);
-      if (downloadData.value) {
-        window.open(downloadData.value.fileUrl, "_blank");
-      }
-      return;
-    } catch (err) {
-      throw new Error(err);
-    }
-  } else if (
-    selectedRes.value === "fullhd" &&
-    query.value.includes("tiktok.com")
-  ) {
-    window.open(data.value.result.video, "_blank");
-  } else {
-    window.open(selectedRes.value, "_blank");
-  }
+const handleDownload = () => {
+  if (!selectedRes.value) return;
+  // download_url is a relative path like "/download?url=..." served by the API.
+  window.location.href = apiBase + selectedRes.value;
+};
+
+const formatLabel = (f) => {
+  const size = f.filesize ? ` · ${(f.filesize / 1048576).toFixed(0)} MB` : "";
+  return `${f.ext.toUpperCase()} ${f.resolution}${size}`;
 };
 
 const handlePasteFromClipboard = async (e) => {
@@ -93,13 +83,13 @@ const handleClearInput = () => {
         <Switch
           v-model="enabled"
           :class="!enabled ? 'bg-primary' : 'bg-primary-700'"
-          class="relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75"
+          class="relative inline-flex items-center h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75"
         >
           <span class="sr-only">Use setting</span>
           <span
             aria-hidden="true"
-            :class="enabled ? 'translate-x-[21px]' : 'translate-x-[2px]'"
-            class="pointer-events-none size-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out grid place-items-center translate-y-[1px]"
+            :class="enabled ? 'translate-x-[30px]' : 'translate-x-[2px]'"
+            class="pointer-events-none size-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out grid place-items-center"
           >
             <component :is="!enabled ? SunIcon : MoonIcon" class="size-3" />
           </span>
@@ -170,44 +160,24 @@ const handleClearInput = () => {
     <section
       class="bg-secondary w-full pb-6 pt-16 rounded-b-[2rem] -translate-y-8 relative z-10 text-center text-white"
     >
-      <h1 v-if="!isLoading && !error && Object.keys(data).length === 0">
-        Try to paste now!
-      </h1>
+      <h1 v-if="!isLoading && !error && !data">Try to paste now!</h1>
 
       <CardVideo
-        v-if="!isLoading && !error && Object.keys(data).length > 0"
-        :title="
-          query.includes('youtube.com') || query.includes('youtu.be')
-            ? data.title
-            : data.result.desc
-        "
-        :source-url="data.video_url || query"
-        :is-youtube="
-          query.includes('youtube.com') || query.includes('youtu.be')
-        "
+        v-if="!isLoading && !error && data"
+        :title="data.title"
+        :source-url="query"
+        :is-youtube="isYoutube"
       >
         <template #thumbnail>
           <img
-            v-if="
-              query.includes('youtube.com') ||
-              (query.includes('youtu.be') && data?.thumbnails)
-            "
-            :src="data?.thumbnails[data?.thumbnails.length - 1].url"
-            :alt="data?.title"
-            class="absolute inset-0 size-full rounded-lg object-cover"
-          />
-          <video
-            v-else
-            :src="data.result.video"
+            v-if="data.thumbnail"
+            :src="data.thumbnail"
+            :alt="data.title"
             class="absolute inset-0 size-full rounded-lg object-cover"
           />
         </template>
         <template #resolutions>
-          <form
-            @submit.prevent="handleDownload"
-            class="flex flex-col"
-            v-if="!isDownloadingError"
-          >
+          <form @submit.prevent="handleDownload" class="flex flex-col">
             <div class="flex flex-col justify-start mt-2">
               <label for="resolution" class="text-sm mb-1">Resolutions</label>
               <div
@@ -219,16 +189,13 @@ const handleClearInput = () => {
                   class="bg-secondary-700 focus:outline-none text-sm appearance-none flex-1 absolute size-full inset-0 z-10 px-3"
                   v-model="selectedRes"
                 >
-                  <option value="Choose One" disabled selected>
-                    Choose One
-                  </option>
-                  <option value="fullhd">MP4 Full HD (May take a while)</option>
+                  <option value="" disabled>Choose One</option>
                   <option
-                    v-if="data.formats"
                     v-for="format in data.formats"
-                    :value="format.url"
+                    :key="format.download_url"
+                    :value="format.download_url"
                   >
-                    MP4 {{ format.qualityLabel }}
+                    {{ formatLabel(format) }}
                   </option>
                 </select>
 
@@ -238,27 +205,10 @@ const handleClearInput = () => {
               </div>
             </div>
 
-            <Button
-              type="submit"
-              class="w-full flex items-center gap-2 mt-2"
-              :disabled="isDownloading"
-            >
-              <template v-if="!isDownloading">
-                <CloudArrowDownIcon class="size-5" /> Download
-              </template>
-              <template v-else>
-                <Spinner class="border-white" /> Downloading ...
-              </template>
+            <Button type="submit" class="w-full flex items-center gap-2 mt-2">
+              <CloudArrowDownIcon class="size-5" /> Download
             </Button>
           </form>
-
-          <div
-            v-else="error"
-            class="w-full flex items-center justify-center gap-2 text-sn"
-          >
-            <ExclamationTriangleIcon class="size-5 text-red-500" />
-            <h1>Something went wrong ...</h1>
-          </div>
         </template>
       </CardVideo>
 
@@ -287,12 +237,11 @@ const handleClearInput = () => {
         How to use <span class="font-bold text-primary">SnapCatch?</span>
       </h1>
       <ul class="flex flex-col gap-5 mt-7">
-        <li class="flex items-start gap-2" v-for="how in howTos">
+        <li class="group flex items-start gap-2" v-for="how in howTos">
           <HowToItem
             :title="how.title"
             :description="how.description"
             :number="how.number"
-            :is-active="how.isActive"
           />
         </li>
       </ul>
