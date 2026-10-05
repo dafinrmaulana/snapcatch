@@ -18,19 +18,21 @@ jobs:
     environment: production
 
     steps:
-      # nginx serves $APP_DIR/dist directly, so there is nothing to restart.
+      # nginx serves $WEB_ROOT (www-data can't read the home dir), so the
+      # build is synced there; static files need no restart.
       # VITE_API_URL comes from $APP_DIR/.env and is baked in at build time.
       - name: Pull and build
         uses: appleboy/ssh-action@v1
         env:
           APP_DIR: /home/dafinmaulana/snapcatch
+          WEB_ROOT: /var/www/snapcatch
           NODE_BIN: /home/dafinmaulana/.nvm/versions/node/v24.21.0/bin
           COMMIT: ${{ github.sha }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          envs: APP_DIR,NODE_BIN,COMMIT
+          envs: APP_DIR,WEB_ROOT,NODE_BIN,COMMIT
           command_timeout: 10m
           script: |
             set -euo pipefail
@@ -50,4 +52,8 @@ jobs:
 
             echo "::group::Build"
             npm run build
+            echo "::endgroup::"
+
+            echo "::group::Publish to $WEB_ROOT"
+            rsync -a --delete dist/ "$WEB_ROOT/"
             echo "::endgroup::"
