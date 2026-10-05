@@ -83,7 +83,7 @@ const handleClearInput = () => {
         <Switch
           v-model="enabled"
           :class="!enabled ? 'bg-primary' : 'bg-primary-700'"
-          class="relative inline-flex items-center h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75"
+          class="relative inline-flex items-center h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white/75"
         >
           <span class="sr-only">Use setting</span>
           <span
@@ -100,12 +100,12 @@ const handleClearInput = () => {
   <main class="p-2 sm:max-w-3xl mx-auto pb-10">
     <form
       @submit.prevent="handleGetData"
-      class="flex flex-col justify-center items-center min-h-80 rounded-[2rem] bg-slate-100 dark:bg-stone-600 px-2 text-center relative z-20 py-10"
+      class="flex flex-col justify-center items-center min-h-80 rounded-4xl bg-slate-100 dark:bg-stone-600 px-2 text-center relative z-20 py-10"
     >
       <img
         src="./assets/img/hero-section.webp"
         alt="a group of people watching phone"
-        class="absolute size-full inset-0 object-cover rounded-[2rem] z-10 opacity-30 grayscale"
+        class="absolute size-full inset-0 object-cover rounded-4xl z-10 opacity-30 grayscale"
       />
       <h3
         class="relative z-20 text-xl text-secondary dark:text-secondary-dark font-medium"
@@ -126,7 +126,7 @@ const handleClearInput = () => {
       >
         <input
           type="url"
-          class="bg-transparent border-none focus-within:outline-none flex-1 text-ellipsis text-sm text-center sm:text-start dark:text-white dark:placeholder:text-secondary-dark/50"
+          class="bg-transparent border-none focus-within:outline-hidden flex-1 text-ellipsis text-sm text-center sm:text-start dark:text-white dark:placeholder:text-secondary-dark/50"
           placeholder="Insert your link here"
           v-model="query"
           @change="(e) => handleChangeQuery(e)"
@@ -158,7 +158,7 @@ const handleClearInput = () => {
 
     <!-- videos -->
     <section
-      class="bg-secondary w-full pb-6 pt-16 rounded-b-[2rem] -translate-y-8 relative z-10 text-center text-white"
+      class="bg-secondary w-full pb-6 pt-16 rounded-b-4xl -translate-y-8 relative z-10 text-center text-white"
     >
       <h1 v-if="!isLoading && !error && !data">Try to paste now!</h1>
 
@@ -181,12 +181,12 @@ const handleClearInput = () => {
             <div class="flex flex-col justify-start mt-2">
               <label for="resolution" class="text-sm mb-1">Resolutions</label>
               <div
-                class="overflow-hidden rounded-md p-2 relative flex items-center h-9 focus-within:ring focus-within:ring-primary duration-150"
+                class="overflow-hidden rounded-md p-2 relative flex items-center h-9 focus-within:ring-3 focus-within:ring-primary duration-150"
               >
                 <select
                   name="resolution"
                   id="resolution"
-                  class="bg-secondary-700 focus:outline-none text-sm appearance-none flex-1 absolute size-full inset-0 z-10 px-3"
+                  class="bg-secondary-700 focus:outline-hidden text-sm appearance-none flex-1 absolute size-full inset-0 z-10 px-3"
                   v-model="selectedRes"
                 >
                   <option value="" disabled>Choose One</option>
@@ -319,6 +319,8 @@ const handleClearInput = () => {
 </template>
 
 <style scoped lang="postcss">
+@reference "./assets/main.css";
+
 .fade-slide-y-enter-active,
 .fade-slide-y-leave-active {
   transition: all 0.3s ease;
@@ -330,6 +332,6 @@ const handleClearInput = () => {
 }
 
 .why-choose-us {
-  @apply flex flex-col text-white border-b sm:border-b-0 sm:border-r border-white/50 border-dashed relative after:w-3.5 after:h-7 after:sm:size-7 after:sm:rounded-full after:sm:translate-x-1/2 after:absolute after:right-0 before:rounded-full before:bottom-0 before:sm:top-0 before:sm:right-0 before:sm:left-auto before:sm:translate-x-1/2 before:sm:bottom-auto before:translate-y-1/2 before:sm:-translate-y-1/2 after:bg-white dark:after:bg-body-dark after:rounded-l-full after:bottom-0 after:translate-y-1/2 before:size-7 before:absolute before:left-0 before:-translate-x-1/2;
+  @apply flex flex-col text-white border-b sm:border-b-0 sm:border-r border-white/50 border-dashed relative after:w-3.5 after:h-7 sm:after:size-7 sm:after:rounded-full sm:after:translate-x-1/2 after:absolute after:right-0 before:rounded-full before:bottom-0 sm:before:top-0 sm:before:right-0 sm:before:left-auto sm:before:translate-x-1/2 sm:before:bottom-auto before:translate-y-1/2 sm:before:-translate-y-1/2 after:bg-white dark:after:bg-body-dark after:rounded-l-full after:bottom-0 after:translate-y-1/2 before:size-7 before:absolute before:left-0 before:-translate-x-1/2;
 }
 </style>

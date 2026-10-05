@@ -20,7 +20,7 @@ const props = defineProps({
       <a
         :href="props.sourceUrl"
         target="_blank"
-        class="py-1 px-2 rounded-full absolute flex left-1 bottom-2 items-center gap-1 shadow"
+        class="py-1 px-2 rounded-full absolute flex left-1 bottom-2 items-center gap-1 shadow-sm"
         :class="{
           'bg-white text-black': props.isYoutube,
           'bg-black text-white': !props.isYoutube,

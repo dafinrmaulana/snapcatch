@@ -13,6 +13,6 @@ import { ChevronDownIcon } from "@heroicons/vue/20/solid";
       <span class="font-medium uppercase text-sm">Eng</span>
       <ChevronDownIcon class="size-4" />
     </button>
-    <div class="absolute top-full bg-white shadow"></div>
+    <div class="absolute top-full bg-white shadow-sm"></div>
   </div>
 </template>
