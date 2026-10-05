@@ -4,7 +4,6 @@ import {
   ChevronDownIcon,
   CloudArrowDownIcon,
   ExclamationTriangleIcon,
-  HeartIcon,
   MoonIcon,
   SunIcon,
   ClipboardIcon,
@@ -305,7 +304,7 @@ const handleClearInput = () => {
   >
     <div class="text-white flex items-center justify-center gap-2 text-sm">
       <span class="flex items-center gap-1">
-        Made with <HeartIcon class="size-4 text-primary" /> by
+        Made with passion by
       </span>
       <a
         href="https://github.com/dafinrmaulana"
